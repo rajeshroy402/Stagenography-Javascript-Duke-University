@@ -1,0 +1,97 @@
+/*Authentic Rajesh Roy*/
+var image1 = new SimpleImage("usain.jpg");
+var image2 = new SimpleImage("skyline.jpg");
+/*var image2_ = new SimpleImage("skyline.jpg");
+var universe = new SimpleImage("smalluniverse.jpg"); */
+var hidder = chop2hide(image1);
+var hidden = shift(image2);
+var combined = combine(hidder, hidden); 
+var extract = extractor(combined);
+print(combined); // stageongraphed image
+print(extract); // the hidden image
+
+
+function crop(image, width, height) {
+    var newImage = new SimpleImage(width, height);
+    for(var pxl of newImage.values()){
+        var x = pxl.getX();
+        var y = pxl.getY();
+        newImage.setPixel(x,y,image.getPixel(x,y));
+        
+        /*
+   if (x < width && y < height){
+     var np = n.getPixel(x,y);
+     np.setRed(p.getRed());
+     np.setBlue(p.getBlue());
+     np.setGreen(p.getGreen()); 
+}
+        */
+    }
+    return newImage;
+}
+
+function clearBit(pixel){
+    var x = Math.floor(pixel/16)*16;
+    return x;
+}
+
+function chop2hide(image){
+    for(var pxl of image.values()){
+        pxl.setRed(clearBit(pxl.getRed()));
+        pxl.setGreen(clearBit(pxl.getGreen()));
+        pxl.setBlue(clearBit(pxl.getBlue()));
+    }
+    return image;
+}
+
+function shift(image){
+    for(var pxl of image.values()){
+        pxl.setRed(pxl.getRed()/16);
+        pxl.setGreen(pxl.getGreen()/16);
+        pxl.setBlue(pxl.getBlue()/16);
+    }
+    return image;
+}
+
+function combine(hiderImage, hiddenImage){
+    var croppedHiderImage = crop(hiderImage, hiddenImage.width, hiddenImage.height);
+    var combinedImage = new SimpleImage(croppedHiderImage.width, croppedHiderImage.height);
+    for (var pxl of combinedImage.values()){
+        var x = pxl.getX();
+        var y = pxl.getY();
+        var show = croppedHiderImage.getPixel(x,y);
+        var hide = hiddenImage.getPixel(x,y);
+        pxl.setRed(show.getRed() + hide.getRed());
+        pxl.setGreen(show.getGreen() + hide.getGreen());
+        pxl.setBlue(show.getBlue() + hide.getBlue());
+    }
+    return combinedImage;
+}
+
+function extractor(combine){
+    var hidden = new SimpleImage(combine.width, combine.height);
+    for (var pxl of hidden.values()){
+        var x = pxl.getX();
+        var y = pxl.getY();
+        var c = combine.getPixel(x,y);
+        pxl.setRed((c.getRed()%16)*16);
+        pxl.setGreen((c.getGreen()%16)*16);
+        pxl.setBlue((c.getBlue()%16)*16);
+    }
+    return hidden;
+}
+
+/*
+var cropWidth = start.getWidth();
+if (hide.getWidth() < cropWidth) {
+	cropWidth = hide.getWidth();
+}
+var cropHeight = start.getHeight();
+if (hide.getHeight() < cropHeight) {
+	cropHeight = hide.getHeight();
+}
+start = crop(start,cropWidth, cropHeight);
+hide = crop(hide,cropWidth, cropHeight);
+print(start);
+print(hide); 
+*/
